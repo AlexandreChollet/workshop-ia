@@ -25,9 +25,11 @@ router.put('/board', function(req, res, next) {
 		x = 7;
 		y = 4;
 	} else {
-		x = Math.floor((Math.random() * 18) + 0);
-		y = Math.floor((Math.random() * 18) + 0);
+		coords = IA_coup(board, 3);
+		x = coords.x;
+		y = coords.y;
 	}
+
 	var json = {
 		"x": x,
 		"y": y
@@ -35,5 +37,125 @@ router.put('/board', function(req, res, next) {
 
 	res.json(json);
 });
+
+function IA_coup(board, profondeur) {
+
+	var coords = { x: null, y: null };
+	coords.x = Math.floor((Math.random() * 18) + 0);
+	coords.y = Math.floor((Math.random() * 18) + 0);
+
+	var max = -10000;
+	var tmp,maxi,maxj;
+
+	for(i=0;i<18;i++)
+     {
+          for(j=0;j<18;j++)
+          {
+                if(board[i][j] == 0)
+                {
+                      board[i][j] = 1;
+                      tmp = Min(board,profondeur-1);
+
+                      if(tmp > max)
+                      {
+                            max = tmp;
+                            maxi = i;
+                            maxj = j;
+                      }
+
+                      board[i][j] = 0;
+                }
+          }
+     }
+
+     coords.x = maxi;
+     coords.y = maxj;
+
+	return coords;
+}
+
+
+function Max(board,profondeur)
+{
+     if(profondeur == 0 || gagnant(board)!=0)
+     {
+          return evaluation(board);
+     }
+
+     var max = -10000;
+     var i,j,tmp;
+
+     for(i=0;i<18;i++)
+     {
+          for(j=0;j<18;j++)
+          {
+                if(board[i][j] == 0)
+                {
+                      board[i][j] = 2;
+                      tmp = Min(board,profondeur-1);
+                      
+                      if(tmp > max)
+                      {
+                            max = tmp;
+                      }
+                      board[i][j] = 0;
+                }
+          }
+     }
+     return max;
+ }
+
+ function Min(board,profondeur)
+{
+     if(profondeur == 0 || gagnant(board)!=0)
+     {
+          return evaluation(board);
+     }
+
+     var min = 10000;
+     var i,j,tmp;
+
+     for(i=0;i<18;i++)
+     {
+          for(j=0;j<18;j++)
+          {
+                if(board[i][j] == 0)
+                {
+                      board[i][j] = 1;
+                      tmp = Max(board,profondeur-1);
+                      
+                      if(tmp < min)
+                      {
+                            min = tmp;
+                      }
+                      board[i][j] = 0;
+                }
+          }
+     }
+     return min;
+}
+
+function evaluation(board) {
+
+	var nb_de_pions = 0;
+
+	//On compte le nombre de pions présents sur le plateau
+     for(i=0;i<18;i++)
+     {
+          for(j=0;j<18;j++)
+          {
+               if(board[i][j] != 0)
+               {
+                    nb_de_pions++;
+               }
+          }
+     }
+}
+
+function gagnant() {
+
+}
+
+
 
 module.exports = router;
