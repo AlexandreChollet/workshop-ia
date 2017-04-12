@@ -7,22 +7,28 @@ router.get('/', function(req, res, next) {
 });
 
 router.put('/board', function(req, res, next) {
-	var x,y;
 
-	if(req.body.round == 1){
+	var x,y;
+	var board = req.body.board;
+	var score = req.body.score;
+	var scoreVs = req.body.score_vs;
+	var playerId = req.body.player;
+	var round = req.body.round;
+
+	if(round == 1) {
 		x = 7;
 		y = 7;
-	}else if(req.body.round == 2){
+	} else if(round == 2) {
 		x = 7;
-		y = 5;
-	}else{
-		x = Math.floor((Math.random() * 18) + 0)
-		y = Math.floor((Math.random() * 18) + 0)
+		y = 4;
+	} else {
+		x = Math.floor((Math.random() * 18) + 0);
+		y = Math.floor((Math.random() * 18) + 0);
 	}
 	var json = {
 		"x": x,
 		"y": y
-	}
+	};
 
 	res.json(json);
 });
