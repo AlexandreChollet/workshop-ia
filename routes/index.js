@@ -342,6 +342,7 @@ function getSubBoard(board) {
   var subBoard = [];
   var subX = 0;
   var subY = 0;
+  var kanker = 0;
 
   // Définition des côtés à traiter
   var sides = [
@@ -375,9 +376,8 @@ function getSubBoard(board) {
       }
       console.log(rowlog);
       rowlog = "";
+      subY = 0;
       subX++;
-      if(subX === maxColumn - minColumn)
-        subX = 0;
     }
   } catch (e){
     console.log(e);
