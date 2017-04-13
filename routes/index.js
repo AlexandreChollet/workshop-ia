@@ -15,13 +15,12 @@ router.put('/board', function(req, res, next) {
 
 	var x,y;
 	var board = req.body.board;
+	var subboard = getSubBoard(board);
 	var score = req.body.score;
 	var scoreVs = req.body.score_vs;
 	var playerId = req.body.player;
 	var round = req.body.round;
 	tenaille = [playerId, getOpponentId(playerId), getOpponentId(playerId), playerId];
-
-	console.log("kek");
 
 	if(round == 1) {
 		x = 7;
@@ -30,9 +29,9 @@ router.put('/board', function(req, res, next) {
 		x = 7;
 		y = 3;
 	} else {
-		coords = IA_coup(board, 1, playerId);
-		x = coords.x;
-		y = coords.y;
+		coords = IA_coup(subboard.subboard, 1, playerId);
+		x = coords.x + subboard.gauche;
+		y = coords.y + subboard.bas;
 	}
 
 	var json = {
@@ -66,9 +65,9 @@ function checkStoneBelongTo(board, line, column, playerId) {
 }
 
 function anyFiveInRow(board,playerId) {
-	for(i=0;i<18;i++)
+	for(i=0;i<board.length;i++)
      {
-		for(j=0;j<18;j++)
+		for(j=0;j<board[0].length;j++)
 		{
 			if(checkStoneBelongTo(board,i,j, playerId)) {
 				directions.forEach(function(d) {
@@ -102,9 +101,9 @@ function isFullRow(board, i, j, d, count, playerId) {
 
 function checkProximity(board, playerId){
 	var score = 0;
-	for(x=0;x<18;x++)
+	for(x=0;x<board.length;x++)
 	{
-		for(y=0;y<18;y++)
+		for(y=0;y<board[0].length;y++)
 		{
 			if(_.isUndefined(board[x]) || _.isUndefined(board[x][y]) || !board[x][y]){
 				continue;
@@ -130,9 +129,9 @@ function checkProximity(board, playerId){
 
 
 function checkTenaille(board, playerId) {
-	for(x=0;x<18;x++)
+	for(x=0;x<board.length;x++)
      {
-		for(y=0;y<18;y++)
+		for(y=0;y<board[0].length;y++)
 		{
 			if(checkStoneBelongTo(board,x,y, playerId)) {
 				directions.forEach(function(direction, index){
@@ -264,9 +263,6 @@ function Max(board,profondeur,playerId)
 
 function evaluation(board,playerId) {
 
-	checkProximity(board,playerId)
-	checkTenaille(board,playerId)
-
 	var nbPions = countPions(board); // équivalent profondeur
 	var score = 0;
 
@@ -278,10 +274,18 @@ function evaluation(board,playerId) {
 		score += -1000 + nbPions;
 
 	// check tenailles
+	if(checkTenaille(board,playerId)) {
+		score += 200 - nbPions;
+	}
+	if(checkTenaille(board,getOpponentId(playerId))) {
+		score += -200 + nbPions;
+	}
 
 	// check proximitée alliée
+	score += checkProximity(board,playerId);
 
 	// check proximitée énnemie
+	score -= checkProximity(board,getOpponentId(playerId));
      
      return score;
 }
