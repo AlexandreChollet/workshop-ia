@@ -30,9 +30,9 @@ router.put('/board', function(req, res, next) {
 		y = 7;
 	} else {
 		console.log(subboard.subboard);
-		coords = IA_coup(subboard.subboard, 1, playerId);
-		x = coords.x + subboard.gauche;
-		y = coords.y + subboard.bas;
+		coords = IA_coup(board, 1, playerId);
+		x = coords.x;
+		y = coords.y;
 	}
 
 	var json = {
@@ -114,16 +114,15 @@ function checkProximity(board, playerId){
 					if(j != 0 && k != 0){
 						stone = getStoneAt(board, x+j, y-k)
 						if(stone==playerId){
-							score+=120/((Math.abs(j)+Math.abs(k))/2)
+							score+=20/((Math.abs(j)+Math.abs(k))/2)
 						}else if(stone==getOpponentId(playerId)){
-							score+=60/((Math.abs(j)+Math.abs(k))/2)
+							score+=10/((Math.abs(j)+Math.abs(k))/2)
 						}
 					}
 				}
 			}
 		}
 	}
-  	console.log(score)
 	return score;
 }
 
@@ -158,7 +157,6 @@ function checkTenaille(board, playerId) {
 
 		}
   	}
-  	console.log("tenaille")
   	return false;
 }
 
@@ -169,9 +167,12 @@ function IA_coup(board, profondeur, playerId) {
 	var max = -10000;
 	var tmp,maxi,maxj;
 
-	for(i=0;i<board.length;i++)
+	console.log("board.length "  + board.length);
+	console.log("board[0].length "  + board[0].length);
+
+	for(var i=0;i<board.length;i++)
      {
-          for(j=0;j<board[0].length;j++)
+          for(var j=0;j<board[0].length;j++)
           {
                 if(board[i][j] == 0)
                 {
@@ -180,11 +181,13 @@ function IA_coup(board, profondeur, playerId) {
 
                       if(tmp > max)
                       {
-                            max = tmp;
-                            maxi = i;
-                            maxj = j;
+                        max = tmp;
+                        maxi = i;
+                        maxj = j;
+                        console.log("i " + i);
+                      	console.log("j " + j);
                       }
-
+                      
                       board[i][j] = 0;
                 }
           }
@@ -375,7 +378,6 @@ function getSubBoard(board) {
         rowlog = rowlog + subBoard[subX][subY] + " ";
         subY++;
       }
-      console.log(rowlog);
       rowlog = "";
       subY = 0;
       subX++;
