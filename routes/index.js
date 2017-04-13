@@ -54,7 +54,7 @@ function getOpponentId(playerId) {
 }
 
 function getStoneAt(board, line, column) {
-	return board[line][column];
+	return _.get(board,"["+line+"]["+column+"]");
 }
 
 function checkStoneBelongTo(board, line, column, playerId) {
@@ -140,6 +140,8 @@ function checkTenaille(board, playerId) {
 					var newY = y;
 					var good = true;
 					tenaille.forEach(function(stone){
+						if(newX < 0 || newY < 0)
+							return false;
 						if(getStoneAt(board, newX, newY) == stone){
 							newX = x + direction[0]
 							newY = y + direction[1]
