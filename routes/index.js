@@ -23,12 +23,13 @@ router.put('/board', function(req, res, next) {
 	tenaille = [playerId, getOpponentId(playerId), getOpponentId(playerId), playerId];
 
 	if(round == 1) {
-		x = 7;
-		y = 7;
+		x = 10;
+		y = 10;
 	} else if(round == 2) {
 		x = 7;
-		y = 3;
+		y = 7;
 	} else {
+		console.log(subboard.subboard);
 		coords = IA_coup(subboard.subboard, 1, playerId);
 		x = coords.x + subboard.gauche;
 		y = coords.y + subboard.bas;
