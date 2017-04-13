@@ -18,7 +18,9 @@ router.put('/board', function(req, res, next) {
 	var scoreVs = req.body.score_vs;
 	var playerId = req.body.player;
 	var round = req.body.round;
-	tenaille = [playerId, getOpponentId(playerId), getOpponentId(playerId), playerId]
+	tenaille = [playerId, getOpponentId(playerId), getOpponentId(playerId), playerId];
+
+	console.log("kek");
 
 	if(round == 1) {
 		x = 7;
@@ -27,7 +29,7 @@ router.put('/board', function(req, res, next) {
 		x = 7;
 		y = 3;
 	} else {
-		coords = IA_coup(board, 3);
+		coords = IA_coup(board, 1, playerId);
 		x = coords.x;
 		y = coords.y;
 	}
@@ -78,19 +80,19 @@ function anyFiveInRow(board,playerId) {
   	return false;
 }
 
-function isFullRow(board, i, j, direction, count, playerId) {
+function isFullRow(board, i, j, d, count, playerId) {
 
-	if(i + (d[0]*count) < 0 && i + (d[0]*count) > board.length || j + (d[1]*count) < 0 && j + (d[1]*count) > board[0].length) {
+	if((i + (d[0]*count)) <= 0 || i + (d[0]*count) > board.length || (j + (d[1]*count)) <= 0 || j + (d[1]*count) > board[0].length) {
 		// Out of bounds
 		return false;
 	}
 
 	if(checkStoneBelongTo(board, i + (d[0]*count), j + (d[1]*count), playerId)) {
 		count++;
-		if(count == 4)
+		if(count == 5)
 			return true;
 		else
-			isFullRow(board, i, j, direction, count);
+			isFullRow(board, i, j, d, count, playerId);
 	} else {
 		return false;
 	}
@@ -136,9 +138,9 @@ function IA_coup(board, profondeur, playerId) {
 	var max = -10000;
 	var tmp,maxi,maxj;
 
-	for(i=0;i<18;i++)
+	for(i=0;i<board.length;i++)
      {
-          for(j=0;j<18;j++)
+          for(j=0;j<board[0].length;j++)
           {
                 if(board[i][j] == 0)
                 {
@@ -161,8 +163,8 @@ function IA_coup(board, profondeur, playerId) {
     coords.y = maxj;
 
     // MOCK
-    coords.x = Math.floor((Math.random() * 18) + 0);
-	coords.y = Math.floor((Math.random() * 18) + 0);
+    //coords.x = Math.floor((Math.random() * 18) + 0);
+	//coords.y = Math.floor((Math.random() * 18) + 0);
 	// END MOCK
 
 	return coords;
@@ -179,9 +181,9 @@ function Max(board,profondeur,playerId)
      var max = -10000;
      var i,j,tmp;
 
-     for(i=0;i<18;i++)
+     for(i=0;i<board.length;i++)
      {
-          for(j=0;j<18;j++)
+          for(j=0;j<board[0].length;j++)
           {
                 if(board[i][j] == 0)
                 {
@@ -209,9 +211,9 @@ function Max(board,profondeur,playerId)
      var min = 10000;
      var i,j,tmp;
 
-     for(i=0;i<18;i++)
+     for(i=0;i<board.length;i++)
      {
-          for(j=0;j<18;j++)
+          for(j=0;j<board[0].length;j++)
           {
                 if(board[i][j] == 0)
                 {
@@ -256,9 +258,9 @@ function checkGagnant(board,playerId) {
 
 function countPions(board) {
 	var nb_de_pions = 0;
-	for(i=0;i<18;i++)
+	for(i=0;i<board.length;i++)
      {
-          for(j=0;j<18;j++)
+          for(j=0;j<board.length[0];j++)
           {
                if(board[i][j] != 0)
                {
@@ -268,11 +270,6 @@ function countPions(board) {
      }
      return nb_de_pions;
 }
-
-function gagnant() {
-
-}
-
 
 
 module.exports = router;
