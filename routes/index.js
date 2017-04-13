@@ -376,6 +376,8 @@ function getSubBoard(board) {
       console.log(rowlog);
       rowlog = "";
       subX++;
+      if(subX === maxColumn - minColumn)
+        subX = 0;
     }
   } catch (e){
     console.log(e);
