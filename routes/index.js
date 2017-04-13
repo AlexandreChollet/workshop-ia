@@ -99,6 +99,33 @@ function isFullRow(board, i, j, d, count, playerId) {
 }
 /* #### END HELPERS #### */
 
+function checkProximity(board, playerId){
+	var score = 0;
+	for(x=0;x<18;x++)
+	{
+		for(y=0;y<18;y++)
+		{
+			if(!board[x][y]){
+				continue;
+			}
+			for(j=-2;j<2;j++){
+				for(k=-2;k<2;k++){
+					if(j != 0 && k != 0){
+						stone = getStoneAt(board, x+j, y-k)
+						if(stone==playerId){
+							score+=120/((Math.abs(j)+Math.abs(k))/2)
+						}else if(stone==getOpponentId(playerId)){
+							score+=60/((Math.abs(j)+Math.abs(k))/2)
+						}
+					}
+				}
+			}
+		}
+	}
+  	console.log(score)
+	return score;
+}
+
 
 
 function checkTenaille(board, playerId) {
@@ -128,6 +155,7 @@ function checkTenaille(board, playerId) {
 
 		}
   	}
+  	console.log("tenaille")
   	return false;
 }
 
@@ -233,6 +261,9 @@ function Max(board,profondeur,playerId)
 
 function evaluation(board,playerId) {
 
+	checkProximity(board,playerId)
+	checkTenaille(board,playerId)
+
 	var nbPions = countPions(board); // équivalent profondeur
 	var score = 0;
 
@@ -271,5 +302,121 @@ function countPions(board) {
      return nb_de_pions;
 }
 
+// Découpe le board en subboard
+function getSubBoard(board) {
+  var minRow = -1;
+  var maxRow = 0;
+  var minColumn = -1;
+  var maxColumn = 0;
+
+  // Récupération des boundaries en fonction des cases occupées par des stones
+  for(i=0;i<18;i++) {
+
+    for(j=0;j<18;j++) {
+
+         if(board[i][j] != 0) {
+            if(minRow < 0){
+              minRow = i;
+            }
+            if(minColumn < 0) {
+              minColumn = j;
+            }
+            maxRow = i;
+            maxColumn = j;
+         }
+      }
+  }
+
+  // Si aucune pièce n'a été jouée, on retourne null
+  if(minRow < 0 || minColumn < 0)
+    return null;
+  
+  // Initialisation du subBoard
+  var subBoard = [];
+  var subX = 0;
+  var subY = 0;
+
+  // Définition des côtés à traiter
+  var sides = [
+    minRow,     // haut
+    maxRow,     // bas
+    minColumn,  // gauche
+    maxColumn   // droite
+  ];
+
+  // Ajout d'une marge fixe autour d'un côté aléatoire du subboard
+  var margin = 4;
+  var randomSide = Math.floor((Math.random() * 3) + 0);
+  sides[randomSide] = addMargin(margin, randomSide, sides);
+
+  // Incrémentation globale de tous les côtés de +1 (sauf le random)
+  for(i=0;i<4;i++) {
+    if(randomSide != i)
+      sides[i] = addMargin(1, i, sides);
+  }
+
+  var rowlog ="";
+
+  // Découpage du board
+  try{
+    for(i=sides[0];i<sides[1]+1;i++) {
+      subBoard[subX] = [];
+      for(j=sides[2];j<sides[3]+1;j++) {
+        subBoard[subX][subY] = board[i][j];
+        rowlog = rowlog + subBoard[subX][subY] + " ";
+        subY++;
+      }
+      console.log(rowlog);
+      rowlog = "";
+      subX++;
+    }
+  } catch (e){
+    console.log(e);
+  }
+
+  var subBoard = {
+    "subboard": subBoard,
+    "haut":     sides[0],
+    "bas":      sides[1],
+    "gauche":   sides[2],
+    "droite":   sides[3]
+  }
+
+  return subBoard;
+}
+
+// Ajoute une marge à un côté du subboard
+function addMargin(margin, side, sides){
+
+  switch(side) {
+    case 0: // haut
+        if(sides[side] > margin)
+          return sides[side] - margin;
+        else
+          return 0;
+        break;
+    case 1: // bas
+        if(18 - sides[side] > margin)
+          return sides[side] + margin;
+        else
+          return 0;
+        break;
+    case 2: // gauche
+        if(sides[side] > margin)
+          return sides[side] - margin;
+        else
+          return 0;
+        break;
+    case 3: // droite
+        if(18 - sides[side] > margin)
+          return sides[side] + margin;
+        else
+          return 0;
+        break;
+    default:
+        console.log("No margin.");
+        return 0;
+  }
+}
 
 module.exports = router;
