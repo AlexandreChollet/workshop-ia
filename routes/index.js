@@ -1,6 +1,7 @@
 var express = require('express');
 var cors = require('cors');
 var router = express.Router();
+var _ = require('lodash')
 var tenaille;
 
 router.use(cors());
@@ -104,7 +105,7 @@ function checkProximity(board, playerId){
 	{
 		for(y=0;y<board[0].length;y++)
 		{
-			if(!board[x][y]){
+			if(_.isUndefined(board[x]) || _.isUndefined(board[x][y]) || !board[x][y]){
 				continue;
 			}
 			for(j=-2;j<2;j++){
