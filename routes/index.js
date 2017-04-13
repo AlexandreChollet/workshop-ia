@@ -304,6 +304,115 @@ function gagnant() {
 
 }
 
+// Découpe le board en subboard
+function getSubBoard(board) {
+  var minRow = -1;
+  var maxRow = 0;
+  var minColumn = -1;
+  var maxColumn = 0;
+
+  // Récupération des boundaries en fonction des cases occupées par des stones
+  for(i=0;i<18;i++) {
+
+    for(j=0;j<18;j++) {
+
+         if(board[i][j] != 0) {
+            if(minRow < 0){
+              minRow = i;
+            }
+            if(minColumn < 0) {
+              minColumn = j;
+            }
+            maxRow = i;
+            maxColumn = j;
+         }
+      }
+  }
+
+  // Si aucune pièce n'a été jouée, on retourne null
+  if(minRow < 0 || minColumn < 0)
+    return null;
+  
+  // Initialisation du subBoard
+  var subBoard = [];
+  var subX = 0;
+  var subY = 0;
+
+  // Définition des côtés à traiter
+  var sides = [
+    minRow,     // haut
+    maxRow,     // bas
+    minColumn,  // gauche
+    maxColumn   // droite
+  ];
+
+  // Ajout d'une marge fixe autour d'un côté aléatoire du subboard
+  var margin = 4;
+  var randomSide = Math.floor((Math.random() * 3) + 0);
+  sides[randomSide] = addMargin(margin, randomSide, sides);
+
+  // Incrémentation globale de tous les côtés de +1 (sauf le random)
+  for(i=0;i<4;i++) {
+    if(randomSide != i)
+      sides[i] = addMargin(1, i, sides);
+  }
+
+  var rowlog ="";
+
+  // Découpage du board
+  try{
+    for(i=sides[0];i<sides[1]+1;i++) {
+      subBoard[subX] = [];
+      for(j=sides[2];j<sides[3]+1;j++) {
+        subBoard[subX][subY] = board[i][j];
+        rowlog = rowlog + subBoard[subX][subY] + " ";
+        subY++;
+      }
+      console.log(rowlog);
+      rowlog = "";
+      subX++;
+    }
+  } catch (e){
+    console.log(e);
+  }
+
+  return subBoard;
+}
+
+// Ajoute une marge à un côté du subboard
+function addMargin(margin, side, sides){
+
+  switch(side) {
+    case 0: // haut
+        if(sides[side] > margin)
+          return sides[side] - margin;
+        else
+          return 0;
+        break;
+    case 1: // bas
+        if(18 - sides[side] > margin)
+          return sides[side] + margin;
+        else
+          return 0;
+        break;
+    case 2: // gauche
+        if(sides[side] > margin)
+          return sides[side] - margin;
+        else
+          return 0;
+        break;
+    case 3: // droite
+        if(18 - sides[side] > margin)
+          return sides[side] + margin;
+        else
+          return 0;
+        break;
+    default:
+        console.log("No margin.");
+        return 0;
+  }
+}
+
 
 
 module.exports = router;
