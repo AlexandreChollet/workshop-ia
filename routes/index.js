@@ -97,6 +97,33 @@ function isFullRow(board, i, j, direction, count, playerId) {
 }
 /* #### END HELPERS #### */
 
+function checkProximity(board, playerId){
+	var score = 0;
+	for(x=0;x<18;x++)
+	{
+		for(y=0;y<18;y++)
+		{
+			if(!board[x][y]){
+				continue;
+			}
+			for(j=-2;j<2;j++){
+				for(k=-2;k<2;k++){
+					if(j != 0 && k != 0){
+						stone = getStoneAt(board, x+j, y-k)
+						if(stone==playerId){
+							score+=120/((Math.abs(j)+Math.abs(k))/2)
+						}else if(stone==getOpponentId(playerId)){
+							score+=60/((Math.abs(j)+Math.abs(k))/2)
+						}
+					}
+				}
+			}
+		}
+	}
+  	console.log(score)
+	return score;
+}
+
 
 
 function checkTenaille(board, playerId) {
@@ -126,6 +153,7 @@ function checkTenaille(board, playerId) {
 
 		}
   	}
+  	console.log("tenaille")
   	return false;
 }
 
@@ -230,6 +258,9 @@ function Max(board,profondeur,playerId)
 }
 
 function evaluation(board,playerId) {
+
+	checkProximity(board,playerId)
+	checkTenaille(board,playerId)
 
 	var nbPions = countPions(board); // équivalent profondeur
 	var score = 0;
