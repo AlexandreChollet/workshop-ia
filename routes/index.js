@@ -1,8 +1,8 @@
 var express = require('express');
-var cors = require('cors')
+var cors = require('cors');
 var router = express.Router();
 
-router.use(cors())
+router.use(cors());
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -23,7 +23,7 @@ router.put('/board', function(req, res, next) {
 		y = 7;
 	} else if(round == 2) {
 		x = 7;
-		y = 4;
+		y = 3;
 	} else {
 		coords = IA_coup(board, 3);
 		x = coords.x;
@@ -38,11 +38,43 @@ router.put('/board', function(req, res, next) {
 	res.json(json);
 });
 
+var directions = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0, -1]];
+
+function getOpponentId(playerId) {
+	if(playerId == 1)
+		return 2;
+	if (playerId == 2)
+		return 1;
+}
+
+function getStoneAt(board, line, column) {
+	return board[line][column];
+}
+
+function checkStoneBelongTo(board, line, column, playerId) {
+	var caseVal = getStoneAt(board,line,column);
+	if(caseVal == playerId)
+		return true;
+	else
+		return false;
+}
+
+function checkFiveInRow(board,playerId) {
+	for(i=0;i<18;i++)
+     {
+		for(j=0;j<18;j++)
+		{
+			if(checkStoneBelongTo(board,line,column, playerId)) {
+				
+			}
+
+		}
+  	}
+}
+
 function IA_coup(board, profondeur) {
 
 	var coords = { x: null, y: null };
-	coords.x = Math.floor((Math.random() * 18) + 0);
-	coords.y = Math.floor((Math.random() * 18) + 0);
 
 	var max = -10000;
 	var tmp,maxi,maxj;
@@ -68,8 +100,11 @@ function IA_coup(board, profondeur) {
           }
      }
 
-     coords.x = maxi;
-     coords.y = maxj;
+    coords.x = maxi;
+    coords.y = maxj;
+
+    coords.x = Math.floor((Math.random() * 18) + 0);
+	coords.y = Math.floor((Math.random() * 18) + 0);
 
 	return coords;
 }
