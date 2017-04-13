@@ -376,6 +376,14 @@ function getSubBoard(board) {
     console.log(e);
   }
 
+  var subBoard = {
+    "subboard": subBoard,
+    "haut":     sides[0],
+    "bas":      sides[1],
+    "gauche":   sides[2],
+    "droite":   sides[3]
+  }
+
   return subBoard;
 }
 
