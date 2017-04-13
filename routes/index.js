@@ -1,6 +1,7 @@
 var express = require('express');
 var cors = require('cors');
 var router = express.Router();
+var tenaille;
 
 router.use(cors());
 
@@ -17,6 +18,7 @@ router.put('/board', function(req, res, next) {
 	var scoreVs = req.body.score_vs;
 	var playerId = req.body.player;
 	var round = req.body.round;
+	tenaille = [playerId, getOpponentId(playerId), getOpponentId(playerId), playerId]
 
 	if(round == 1) {
 		x = 7;
@@ -40,7 +42,7 @@ router.put('/board', function(req, res, next) {
 
 var directions = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0, -1]];
 
-/* #### HELPERS #### */
+
 function getOpponentId(playerId) {
 	if(playerId == 1)
 		return 2;
@@ -95,6 +97,37 @@ function isFullRow(board, i, j, direction, count, playerId) {
 }
 /* #### END HELPERS #### */
 
+
+
+function checkTenaille(board, playerId) {
+	for(x=0;x<18;x++)
+     {
+		for(y=0;y<18;y++)
+		{
+			if(checkStoneBelongTo(board,x,y, playerId)) {
+				directions.forEach(function(direction, index){
+					var newX = x;
+					var newY = y;
+					var good = true;
+					tenaille.forEach(function(stone){
+						if(getStoneAt(board, newX, newY) == stone){
+							newX = x + direction[0]
+							newY = y + direction[1]
+						}else{
+							good = false;
+							return;
+						}
+					})
+					if(good){
+						return true
+					}
+				})
+			}
+
+		}
+  	}
+  	return false;
+}
 
 function IA_coup(board, profondeur, playerId) {
 
