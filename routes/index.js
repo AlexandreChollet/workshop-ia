@@ -40,6 +40,7 @@ router.put('/board', function(req, res, next) {
 
 var directions = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0, -1]];
 
+/* #### HELPERS #### */
 function getOpponentId(playerId) {
 	if(playerId == 1)
 		return 2;
@@ -59,20 +60,43 @@ function checkStoneBelongTo(board, line, column, playerId) {
 		return false;
 }
 
-function checkFiveInRow(board,playerId) {
+function anyFiveInRow(board,playerId) {
 	for(i=0;i<18;i++)
      {
 		for(j=0;j<18;j++)
 		{
-			if(checkStoneBelongTo(board,line,column, playerId)) {
-				
+			if(checkStoneBelongTo(board,i,j, playerId)) {
+				directions.forEach(function(d) {
+					if(isFullRow(board,i,j,d,1,playerId))
+						return true;
+				});
 			}
-
 		}
   	}
+  	return false;
 }
 
-function IA_coup(board, profondeur) {
+function isFullRow(board, i, j, direction, count, playerId) {
+
+	if(i + (d[0]*count) < 0 && i + (d[0]*count) > board.length || j + (d[1]*count) < 0 && j + (d[1]*count) > board[0].length) {
+		// Out of bounds
+		return false;
+	}
+
+	if(checkStoneBelongTo(board, i + (d[0]*count), j + (d[1]*count), playerId)) {
+		count++;
+		if(count == 4)
+			return true;
+		else
+			isFullRow(board, i, j, direction, count);
+	} else {
+		return false;
+	}
+}
+/* #### END HELPERS #### */
+
+
+function IA_coup(board, profondeur, playerId) {
 
 	var coords = { x: null, y: null };
 
@@ -86,7 +110,7 @@ function IA_coup(board, profondeur) {
                 if(board[i][j] == 0)
                 {
                       board[i][j] = 1;
-                      tmp = Min(board,profondeur-1);
+                      tmp = Min(board,profondeur-1,playerId);
 
                       if(tmp > max)
                       {
@@ -103,18 +127,20 @@ function IA_coup(board, profondeur) {
     coords.x = maxi;
     coords.y = maxj;
 
+    // MOCK
     coords.x = Math.floor((Math.random() * 18) + 0);
 	coords.y = Math.floor((Math.random() * 18) + 0);
+	// END MOCK
 
 	return coords;
 }
 
 
-function Max(board,profondeur)
+function Max(board,profondeur,playerId)
 {
      if(profondeur == 0 || gagnant(board)!=0)
      {
-          return evaluation(board);
+          return evaluation(board,playerId);
      }
 
      var max = -10000;
@@ -140,11 +166,11 @@ function Max(board,profondeur)
      return max;
  }
 
- function Min(board,profondeur)
+ function Min(board,profondeur,playerId)
 {
      if(profondeur == 0 || gagnant(board)!=0)
      {
-          return evaluation(board);
+          return evaluation(board, playerId);
      }
 
      var min = 10000;
@@ -170,12 +196,34 @@ function Max(board,profondeur)
      return min;
 }
 
-function evaluation(board) {
+function evaluation(board,playerId) {
 
+	var nbPions = countPions(board); // équivalent profondeur
+	var score = 0;
+
+	// check 5 row alliée
+	if(anyFiveInRow(board,playerId))
+		score += 1000 - nbPions;
+	// check 5 row ennemie
+	if(anyFiveInRow(board,getOpponentId(playerId)))
+		score += -1000 + nbPions;
+
+	// check tenailles
+
+	// check proximitée alliée
+
+	// check proximitée énnemie
+     
+     return score;
+}
+
+function checkGagnant(board,playerId) {
+
+}
+
+function countPions(board) {
 	var nb_de_pions = 0;
-
-	//On compte le nombre de pions présents sur le plateau
-     for(i=0;i<18;i++)
+	for(i=0;i<18;i++)
      {
           for(j=0;j<18;j++)
           {
@@ -185,6 +233,7 @@ function evaluation(board) {
                }
           }
      }
+     return nb_de_pions;
 }
 
 function gagnant() {
